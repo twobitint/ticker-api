@@ -17,10 +17,14 @@ class Post extends Model
         // Words.
         'I',
         'A',
+        // Finance Terms.
+        'IPO',
+        'CEO',
         // Sub Terms.
         'DD',
         'BUY',
         'VERY',
+        'SUB',
         // Orgs.
         'CDC',
         'US',
@@ -37,6 +41,11 @@ class Post extends Model
     public function stocks()
     {
         return $this->belongsToMany(Stock::class);
+    }
+
+    public function getContentHtmlAttribute()
+    {
+        return nl2br($this->content);
     }
 
     public function getPotentialSymbolsInTitleAttribute()
@@ -71,7 +80,7 @@ class Post extends Model
     public function updateStocks()
     {
         $ids = [];
-        foreach ($this->potentialSymbolsInTitle as $symbol) {
+        foreach ($this->potentialSymbols as $symbol) {
             if ($stock = Stock::fromYahoo($symbol)) {
                 $ids[] = $stock->id;
             } else {

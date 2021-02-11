@@ -19,7 +19,8 @@ class Reddit
 
         foreach ($results as $result) {
             $data = $result['data'];
-            $post = Post::firstOrNew(['url' => $data['url']]);
+            $url = 'https://reddit.com' . $data['permalink'];
+            $post = Post::firstOrNew(['url' => $url]);
 
             // Update post data.
             $post->title = $data['title'];
