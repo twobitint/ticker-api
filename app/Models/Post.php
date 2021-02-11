@@ -14,10 +14,13 @@ class Post extends Model
     // because they are common terms in the community typically not related to
     // a stock.
     protected $ignoredSymbols = [
-        // Pronouns.
+        // Words.
         'I',
+        'A',
         // Sub Terms.
         'DD',
+        'BUY',
+        'VERY',
         // Orgs.
         'CDC',
         'US',
@@ -38,18 +41,20 @@ class Post extends Model
 
     public function getPotentialSymbolsInTitleAttribute()
     {
-        preg_match_all('/(^|[\s\$])([A-Z]{1,5})($|[\s,.:!?;\'])/', $this->title, $matches);
-        return array_filter($matches[2], function ($symbol) {
-            return !in_array($symbol, $this->ignoredSymbols);
-        });
+        return $this->symbolsInString($this->title);
     }
 
     public function getPotentialSymbolsInContentAttribute()
     {
-        preg_match_all('/(^|[\s\$])([A-Z]{1,5})($|[\s,.:!?;\'])/', $this->content, $matches);
-        return array_filter($matches[2], function ($symbol) {
+        return $this->symbolsInString($this->content);
+    }
+
+    private function symbolsInString($string)
+    {
+        preg_match_all('/(^|[\s\$])([A-Z]{1,5})($|[\s,.:!?;\'])/', $string, $matches);
+        return array_unique(array_filter($matches[2], function ($symbol) {
             return !in_array($symbol, $this->ignoredSymbols);
-        });
+        }), SORT_REGULAR);
     }
 
     public function getPotentialSymbolsAttribute()
@@ -66,10 +71,12 @@ class Post extends Model
     public function updateStocks()
     {
         $ids = [];
-        foreach ($this->potentialSymbols as $symbol) {
-            $stock = Stock::firstOrNew(['symbol' => $symbol]);
-            $stock->updateFromYahoo();
-            $ids[] = $stock->id;
+        foreach ($this->potentialSymbolsInTitle as $symbol) {
+            if ($stock = Stock::fromYahoo($symbol)) {
+                $ids[] = $stock->id;
+            } else {
+                // Log symbol does not exist.
+            }
         }
 
         $this->stocks()->sync($ids);
