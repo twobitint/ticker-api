@@ -10,32 +10,6 @@ class Post extends Model
 {
     use HasFactory;
 
-    // List of symbols to not try to process as an actual stock,
-    // because they are common terms in the community typically not related to
-    // a stock.
-    protected $ignoredSymbols = [
-        // Words.
-        'I',
-        'A',
-        // Finance Terms.
-        'IPO',
-        'CEO',
-        // Sub Terms.
-        'DD',
-        'BUY',
-        'VERY',
-        'SUB',
-        'GO',
-        'BUY',
-        'NOW',
-        'ON',
-        'LOW',
-        'HIGH',
-        // Orgs.
-        'CDC',
-        'US',
-    ];
-
     protected $fillable = [
         'url',
     ];
@@ -97,7 +71,7 @@ class Post extends Model
     {
         preg_match_all('/(^|[\s\$])([A-Z]{1,5})($|[\s,.:!?;\'])/', $string, $matches);
         return array_unique(array_filter($matches[2], function ($symbol) {
-            return !in_array($symbol, $this->ignoredSymbols);
+            return !in_array($symbol, config('stocks.symbols.ignored'));
         }), SORT_REGULAR);
     }
 

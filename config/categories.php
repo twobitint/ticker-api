@@ -8,9 +8,10 @@ return [
         'catalyst',
     ],
     'discussion' => [
-        'advice request',
-        'company question',
-        'question',
+        'company discussion',
+        'advice',
+        'ticker discussion',
+        'discussion',
     ],
     'bullish' => [
         'bullish',
