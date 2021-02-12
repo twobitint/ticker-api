@@ -17,6 +17,35 @@ class Stock extends Model
         'earnings' => 'datetime',
     ];
 
+    public function getColorAttribute()
+    {
+        return substr(md5($this->symbol), 0, 6);
+    }
+
+    public function getUpAttribute()
+    {
+        return $this->regular_market_change_percent >= 0;
+    }
+
+    public function getMarketCapForHumansAttribute()
+    {
+        if ($this->market_cap < 1000000) {
+            // Anything less than a million
+            return number_format($this->market_cap);
+        } else if ($this->market_cap < 1000000000) {
+            // Anything less than a billion
+            return number_format($this->market_cap / 1000000, 2) . 'M';
+        } else {
+            // At least a billion
+            return number_format($this->market_cap / 1000000000, 2) . 'B';
+        }
+    }
+
+    public static function trending()
+    {
+        return self::latest()->limit(5)->get();
+    }
+
     /**
      * This function has side-effects. It will save the stock to the db if
      * found.
@@ -45,7 +74,7 @@ class Stock extends Model
             $stock->symbol = $symbol;
         }
 
-        $stock->name = $inc['longName'];
+        $stock->name = $inc['shortName'] ?? $inc['longName'];
         $stock->exchange = $inc['exchange'];
 
         $stock->fifty_two_week_low_change = $inc['fiftyTwoWeekLowChange'] ?? null;

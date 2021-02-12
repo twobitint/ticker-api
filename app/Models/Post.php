@@ -25,6 +25,12 @@ class Post extends Model
         'BUY',
         'VERY',
         'SUB',
+        'GO',
+        'BUY',
+        'NOW',
+        'ON',
+        'LOW',
+        'HIGH',
         // Orgs.
         'CDC',
         'US',
@@ -45,7 +51,36 @@ class Post extends Model
 
     public function getContentHtmlAttribute()
     {
-        return nl2br($this->content);
+        // Remove links.
+        $html = preg_replace('#<a.*?>.*?</a>#i', '', $this->content);
+
+        // Remove other stuff.
+        return strip_tags($html, ['p', 'br']);
+    }
+
+    public function getHeroIconNameAttribute()
+    {
+        foreach (config('categories') as $cat => $subcategories) {
+            if (in_array($this->subcategory, $subcategories)) {
+                switch ($cat) {
+                    case 'analysis':
+                        return 'clipboard-list';
+                    case 'discussion':
+                        return 'chat-alt-2';
+                    case 'help':
+                        return 'question-mark-circle';
+                    case 'bullish':
+                        return 'trending-up';
+                    case 'bearish':
+                        return 'trending-down';
+                    case 'catalysts':
+                        return 'fire';
+                    case 'memes':
+                        return 'trash';
+                }
+            }
+        }
+        return 'collection';
     }
 
     public function getPotentialSymbolsInTitleAttribute()

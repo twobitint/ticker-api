@@ -18,3 +18,11 @@ Route::get('/', function () {
         'posts' => App\Models\Post::latest()->paginate(),
     ]);
 });
+
+Route::get('/cat/{cat}', function ($cat) {
+    return view('home', [
+        'posts' => App\Models\Post::whereIn('subcategory', config('categories.'.$cat))
+            ->latest()
+            ->paginate(),
+    ]);
+})->name('cat');

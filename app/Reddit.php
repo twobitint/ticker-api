@@ -24,12 +24,12 @@ class Reddit
 
             // Update post data.
             $post->title = $data['title'];
-            $post->content = $data['selftext'] ?? null;
+            $post->content = html_entity_decode($data['selftext_html']);
             $post->source = 'reddit';
             $post->author = $data['author'];
-            $post->category = $sub;
+            $post->category = strtolower($sub);
             $post->subcategory = self::cleanFlair($data['link_flair_text'] ?? null);
-            $post->posted_at = $data['created'];
+            $post->posted_at = $data['created_utc'];
             $post->score = $data['score'];
             $post->score_confidence = $data['upvote_ratio'];
 
@@ -44,6 +44,7 @@ class Reddit
     {
         $string = preg_replace('/:.*:/', '', $string);
         $string = trim($string);
+        $string = strtolower($string);
         return $string;
     }
 }
