@@ -11,14 +11,14 @@
             {{ $stock->name }}
           </div>
           <div class="text-xs text-gray-400">
-            {{ $stock->market_cap_for_humans }}
+            {{ $stock->posts_count }} posts
           </div>
         </div>
         <div class="w-20 flex-none text-right">
           ${{ number_format($stock->regular_market_price, 2) }}
         </div>
         <div class="w-24 flex-none flex flex-row-reverse">
-          <div class="rounded-md flex items-center p-1 {{
+          <div class="rounded-md flex items-center px-2 py-1 {{
               $stock->up
                 ? 'bg-green-200 text-green-700'
                 : 'bg-red-200 text-red-700'

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
@@ -16,6 +17,11 @@ class Stock extends Model
         'first_trade_date' => 'datetime',
         'earnings' => 'datetime',
     ];
+
+    public function posts()
+    {
+        return $this->belongsToMany(Post::class);
+    }
 
     public function getColorAttribute()
     {
@@ -43,7 +49,12 @@ class Stock extends Model
 
     public static function trending()
     {
-        return self::latest()->limit(5)->get();
+        return self::withCount(['posts' => function (Builder $query) {
+            $query->where('posted_at', '>=', now()->subDay());
+        }])
+            ->orderBy('posts_count', 'desc')
+            ->limit(5)
+            ->get();
     }
 
     /**

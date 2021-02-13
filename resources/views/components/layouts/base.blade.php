@@ -13,5 +13,7 @@
   </head>
   <body {{ $attributes->merge(['class' => 'antialiased']) }}>
     {{ $slot }}
+
+    <x-footer/>
   </body>
 </html>

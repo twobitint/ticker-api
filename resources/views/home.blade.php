@@ -1,6 +1,6 @@
 <x-layouts.base>
   <x-navbar/>
-  <div class="container mx-auto grid grid-cols-12 gap-4 pt-10">
+  <div class="container mx-auto grid grid-cols-12 gap-4 pt-10 mb-20">
     <section class="col-span-2">
       <x-menu/>
     </section>
