@@ -8,10 +8,10 @@ return [
         // a stock.
         'ignored' => [
             // Words.
-            'I',
-            'A',
             'AM',
             'PM',
+            'THC',
+            'CBD',
             // Finance Terms.
             'IPO',
             'CEO',
@@ -21,6 +21,8 @@ return [
             'LOW',
             'HIGH',
             'BUY',
+            'ROI',
+            'REIT',
             // Sub Terms.
             'DD',
             'BUY',
@@ -29,14 +31,21 @@ return [
             'GO',
             'NOW',
             'ON',
+            'YOLO',
+            'HOLD',
+            'HODL',
             // Orgs.
             'CDC',
-            'US',
-            'USA',
             'FBI',
             'IRS',
             'NSA',
             'CIA',
+            // Places.
+            'CA',
+            'UK',
+            'US',
+            'USA',
+            'MN',
         ],
     ],
 ];

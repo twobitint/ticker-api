@@ -64,15 +64,26 @@ class Post extends Model
 
     public function getPotentialSymbolsInContentAttribute()
     {
-        return $this->symbolsInString($this->content);
+        return $this->symbolsInString(strip_tags($this->content))   ;
     }
 
     private function symbolsInString($string)
     {
-        preg_match_all('/(^|[\s\$])([A-Z]{1,5})($|[\s,.:!?;\'])/', $string, $matches);
-        return array_unique(array_filter($matches[2], function ($symbol) {
+        $found = [];
+        // First get all dollarsign-led symbols and assume they are stocks.
+        if (preg_match_all('/\$([a-zA-Z]{1,5})/', $string, $matches)) {
+            $string = preg_replace('/\$[a-zA-Z]{1,5}/', '', $string);
+            $found = $matches[1];
+        }
+        // Then search for allcaps strings, filter, and merge.
+        // Do not allow single-character symbols in this search. It must have
+        // the $ in this case.
+        preg_match_all('/\b[A-Z]{2,5}\b/', $string, $matches);
+        $found = array_merge(array_filter($matches[0], function ($symbol) {
             return !in_array($symbol, config('stocks.symbols.ignored'));
-        }), SORT_REGULAR);
+        }), $found);
+        // Return only one of earch symbol.
+        return array_unique($found, SORT_REGULAR);
     }
 
     public function getPotentialSymbolsAttribute()
