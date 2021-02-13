@@ -3,7 +3,7 @@
 
     <section class="col-span-2">
       <div class="flex-shrink-0 flex items-center">
-        <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">
+        <x-logo class="max-h-11 w-auto" mode="light" />
       </div>
     </section>
 

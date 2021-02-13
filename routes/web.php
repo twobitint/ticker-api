@@ -25,10 +25,10 @@ Route::get('welcome', function () {
 })->name('welcome');
 Route::get('terms', function () {
     return view('terms');
-});
+})->name('terms');
 Route::get('privacy', function () {
     return view('privacy');
-});
+})->name('privacy');
 Route::get('login', function () {
     return Socialite::driver('google')->redirect();
 })->name('login');
@@ -62,5 +62,10 @@ Route::middleware('auth')->group(function () {
                 ->paginate(),
         ]);
     })->name('cat');
+
+    Route::get('logout', function () {
+        Auth::logout();
+        return redirect()->route('welcome');
+    });
 
 });
