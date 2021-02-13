@@ -23,15 +23,29 @@ Route::get('welcome', function () {
     }
     return redirect()->route('home');
 })->name('welcome');
+
 Route::get('terms', function () {
     return view('terms');
 })->name('terms');
+
 Route::get('privacy', function () {
     return view('privacy');
 })->name('privacy');
+
 Route::get('login', function () {
+    // Generate a fake local user.
+    if (config('app.env') == 'local') {
+        $user = User::firstOrNew(['email' => 'test@example.com']);
+        $user->name = 'Emma Fake';
+        $user->picture_url = 'https://randomuser.me/api/portraits/thumb/women/75.jpg';
+        $user->save();
+        Auth::login($user);
+        return redirect()->route('home');
+    }
+    // Use actual google auth.
     return Socialite::driver('google')->redirect();
 })->name('login');
+
 Route::get('login/google/redirect', function () {
     $google = Socialite::driver('google')->user();
 
