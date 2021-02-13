@@ -13,6 +13,8 @@
         <link href="/css/app.css" rel="stylesheet">
     </head>
     <body class="antialiased">
-        <h1 class="justify-center">Hello, world</h1>
+        <h1 class="justify-center">
+          <a href="{{ route('login') }}">Log in</a>
+        </h1>
     </body>
 </html>
