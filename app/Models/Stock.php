@@ -24,9 +24,14 @@ class Stock extends Model
         return $this->belongsToMany(Post::class);
     }
 
-    public function users()
+    public function usersHolding()
     {
-        return $this->belongsToMany(User::class, 'positions');
+        return $this->belongsToMany(User::class, 'positions')->using(Position::class);
+    }
+
+    public function usersWatching()
+    {
+        return $this->belongsToMany(User::class, 'watchlist')->using(Watcher::class);
     }
 
     public function getColorAttribute()
@@ -55,17 +60,22 @@ class Stock extends Model
 
     public static function trending($owned = false)
     {
-        $builder = self::withCount(['posts' => function (Builder $query) {
-            $query->where('posted_at', '>=', now()->subDay());
+        $builder = self::withCount(['posts' => function (Builder $query) use ($owned) {
+            // if (!$owned) {
+            //     $query->where('posted_at', '>=', now()->subDay());
+            // } else {
+                $query->where('posted_at', '>=', now()->subDays(5));
+            //}
         }]);
 
         if ($owned) {
-            $builder->whereHas('users', function (Builder $query) {
-                $query->where('id', '=', Auth::id());
+            $builder->whereHas('usersHolding', function (Builder $query) {
+                $query->where('users.id', '=', Auth::id());
             });
         }
 
         return $builder->orderBy('posts_count', 'desc')
+            ->having('posts_count', '>', 0)
             ->limit(5)
             ->get();
     }

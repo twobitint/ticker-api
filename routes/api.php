@@ -22,10 +22,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('posts', function (Request $request) {
-    return PostResource::collection(Post::orderBy('posted_at', 'desc')->paginate());
-});
+// Route::get('posts', function (Request $request) {
+//     return PostResource::collection(Post::orderBy('posted_at', 'desc')->paginate());
+// });
 
-Route::get('stock/{symbol}', function (Request $request, string $symbol) {
-    return new StockResource(Stock::where('symbol', $symbol)->first());
-});
+// Route::get('stock/{symbol}', function (Request $request, string $symbol) {
+//     return new StockResource(Stock::where('symbol', $symbol)->first());
+// });

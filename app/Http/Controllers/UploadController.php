@@ -13,5 +13,7 @@ class UploadController extends Controller
         if ($request->hasFile('positions')) {
             Excel::import(new PositionsImport, $request->file('positions'));
         }
+
+        return redirect()->route('home');
     }
 }

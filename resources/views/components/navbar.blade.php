@@ -35,9 +35,26 @@
         </button>
         </div>
         <div x-show="open" x-description="Profile dropdown panel, show/hide based on dropdown state." x-transition:enter="transition ease-out duration-100" x-transition:enter-start="transform opacity-0 scale-95" x-transition:enter-end="transform opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="transform opacity-100 scale-100" x-transition:leave-end="transform opacity-0 scale-95" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" role="menu" aria-orientation="vertical" aria-labelledby="user-menu" style="display: none;">
-        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Your Profile</a>
-        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Settings</a>
-        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
+        <a href="#" role="menuitem"
+          class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          @click="$refs.positionUploader.click()"
+        >
+          Upload Positions
+          <form method="post"
+            enctype="multipart/form-data"
+            class="hidden"
+            x-ref="positionUploaderForm"
+            action="{{ route('upload-positions') }}"
+          >
+            @csrf
+            <input name="positions"
+              type="file"
+              x-ref="positionUploader"
+              @change="$refs.positionUploaderForm.submit()"
+            >
+          </form>
+        </a>
+        <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
         </div>
       </div>
       </div>

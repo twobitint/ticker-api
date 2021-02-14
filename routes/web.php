@@ -65,9 +65,17 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/', function () {
         return view('home', [
-            'posts' => App\Models\Post::latest()->paginate(),
+            'posts' => App\Models\Post::with('stocks')
+                ->latest()
+                ->paginate(),
         ]);
     })->name('home');
+
+    Route::get('stock/{stock:symbol}', function (App\Models\Stock $stock) {
+        return view('stock', [
+            'stock' => $stock,
+        ]);
+    })->name('stock');
 
     Route::get('/cat/{cat}', function ($cat) {
         return view('home', [
@@ -80,6 +88,8 @@ Route::middleware('auth')->group(function () {
     Route::get('logout', function () {
         Auth::logout();
         return redirect()->route('welcome');
-    });
+    })->name('logout');
+
+    Route::post('user/upload-positions', 'App\Http\Controllers\UploadController@handlePositions')->name('upload-positions');
 
 });

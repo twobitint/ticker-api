@@ -1,0 +1,20 @@
+﻿Account Name/Number,Symbol,Description,Quantity,Last Price,Last Price Change,Current Value,Today's Gain/Loss Dollar,Today's Gain/Loss Percent,Total Gain/Loss Dollar,Total Gain/Loss Percent,Percent Of Account,Cost Basis,Cost Basis Per Share,Type
+Z07505284,BB,BLACKBERRY LTD COM ISIN #CA09228F1036 SEDOL #BCBHZ31,8,$13.04,+$0.58,$104.32,+$4.64,+4.65%,+$4.36,+4.36%,2.35%,$99.96,$12.50,Cash,
+Z07505284,CRBP,CORBUS PHARMACEUTICALS HLDGS I COM,28,$2.99,-$0.35,$83.72,-$9.80,-10.48%,-$13.16,-13.59%,1.88%,$96.88,$3.46,Cash,
+Z07505284,FTEC,FIDELITY MSCI INFORMATION TECHNOLOGY INDEX ETF,8,$112.48,+$0.73,$899.84,+$5.84,+0.65%,+$7.96,+0.89%,20.25%,$891.88,$111.49,Cash,
+Z07505284,SPAXX**,FIDELITY GOVERNMENT MONEY MARKET,"2,752.11",$1.00,$0.00,"$2,752.11",n/a,n/a,n/a,n/a,61.94%,n/a,n/a,Cash,
+Z07505284,HITIF,HIGH TIDE INC COM NPV ISIN #CA42981E1043 SEDOL #BGC16N7,100,$0.6149,-$0.0712,$61.49,-$7.12,-10.37%,+$16.85,+37.74%,1.38%,$44.64,$0.45,Cash,
+Z07505284,MLFB,MAJOR LEAGUE FOOTBALL INC,"2,000",$0.034,+$0.0011,$68.15,+$2.24,+3.39%,-$2.75,-3.88%,1.53%,$70.90,$0.04,Cash,
+Z07505284,PHBI,PHARMAGREEN BIOTECH INC COM,800,$0.058,+$0.0025,$46.40,+$2.00,+4.50%,-$2.80,-5.70%,1.04%,$49.20,$0.06,Cash,
+Z07505284,PULM,PULMATRIX INC COM NEW,100,$2.02,+$0.01,$202.00,+$1.00,+0.49%,+$4.00,+2.02%,4.55%,$198.00,$1.98,Cash,
+Z07505284,SNGX,SOLIGENIX INC COM,51,$2.14,+$0.06,$109.14,+$3.06,+2.88%,+$9.28,+9.29%,2.46%,$99.86,$1.96,Cash,
+Z07505284,SONM,SONIM TECHNOLOGIES INC COM,85,$1.18,-$0.01,$100.30,-$0.85,-0.85%,+$0.42,+0.42%,2.26%,$99.88,$1.18,Cash,
+Z07505284,ETFM,2050 MTRS INC COM,"27,777",$0.0132,+$0.0032,$366.65,+$88.88,+32.00%,+$116.66,+46.66%,8.25%,$249.99,$0.01,Cash,
+Z07505284,TYME,TYME TECHNOLOGIES INC COM,30,$2.73,-$0.09,$81.90,-$2.70,-3.20%,+$13.51,+19.75%,1.84%,$68.39,$2.28,Cash,
+Z07505284,Pending Activity,,,,,-$432.93,,,,,,,,,
+
+"The data and information in this spreadsheet is provided to you solely for your use and is not for distribution. The spreadsheet is provided for informational purposes only, and is not intended to provide advice, nor should it be construed as an offer to sell, a solicitation of an offer to buy or a recommendation for any security by Fidelity or any third party. Data and information shown is based on information known to Fidelity as of the date it was exported and is subject to change. It should not be used in place of your account statements or trade confirmations and is not intended for tax reporting purposes. For more information on the data included in this spreadsheet, including any limitations thereof, go to Fidelity.com."
+
+"Brokerage services are provided by Fidelity Brokerage Services LLC, 900 Salem Street, Smithfield, RI 02917. Custody and other services provided by National Financial Services LLC. Both are Fidelity Investment companies and members SIPC, NYSE."
+
+"Date downloaded 02/13/2021 8:43 PM ET"

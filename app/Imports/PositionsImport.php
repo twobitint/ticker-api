@@ -8,17 +8,21 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class PositionsImport implements ToCollection
+class PositionsImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
         $ids = [];
         foreach ($rows as $row) {
-            if ($stock = Stock::fromYahoo($row['symbol'])) {
-                $ids[] = $stock->id;
+            if ($symbol = $row['symbol'] ?? false) {
+                if ($stock = Stock::fromYahoo($symbol)) {
+                    $ids[] = $stock->id;
+                }
             }
         }
 
-        Auth::user()->stocks()->sync($ids);
+        /** @var $user App\User */
+        $user = Auth::user();
+        $user->stocksInPositions()->sync($ids);
     }
 }

@@ -1,4 +1,5 @@
-<div class="rounded-full py-1 px-2 m-0.5 border border-gray-300 font-mono text-xs text-gray-600 flex items-center">
+<a href="{{ route('stock', $model) }}"
+  class="rounded-full py-1 px-2 m-0.5 border border-gray-300 font-mono text-xs text-gray-600 flex items-center hover:bg-gray-100">
   <div class="pr-1">
     {{ $model->symbol }}
   </div>
@@ -13,4 +14,4 @@
       {{ number_format(abs($model->regular_market_change_percent), 2) }}%
     </div>
   @endif
-</div>
+</a>

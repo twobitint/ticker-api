@@ -41,8 +41,18 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function stocks()
+    public function stocksInPositions()
     {
-        return $this->belongsToMany(Stock::class, 'positions');
+        return $this->belongsToMany(Stock::class, 'positions')->using(Position::class);
+    }
+
+    public function stocksInWatchlist()
+    {
+        return $this->belongsToMany(Stock::class, 'watchlist')->using(Watcher::class);
+    }
+
+    public function positions()
+    {
+        return $this->hasMany(Position::class);
     }
 }
