@@ -12,6 +12,8 @@ return [
             'PM',
             'THC',
             'CBD',
+            'MD',
+            'AND',
             // Finance Terms.
             'IPO',
             'CEO',
@@ -23,6 +25,8 @@ return [
             'BUY',
             'ROI',
             'REIT',
+            'EPS',
+            'PDT',
             // Sub Terms.
             'DD',
             'BUY',
@@ -34,6 +38,11 @@ return [
             'YOLO',
             'HOLD',
             'HODL',
+            'KEY',
+            'PROS',
+            'CONS',
+            'PRO',
+            'CON',
             // Orgs.
             'CDC',
             'FBI',
