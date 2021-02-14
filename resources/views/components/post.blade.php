@@ -1,4 +1,4 @@
-<article class="bg-white rounded-md shadow p-6">
+<article class="bg-white rounded-md shadow p-6" x-data="post()">
     <header class="flex mb-4">
         <div title="{{ $model->subcategory }}">
             <x-dynamic-component
@@ -14,7 +14,11 @@
         <a href="{{ $model->url }}">{{ $model->title }}</a>
     </p>
     {{-- There is a bug with grid and word break that has to be handled via inline style here --}}
-    <div class="user-content line-clamp-6 pt-3 mb-4 text-gray-600 max-w-full" style="word-break: break-word;">
+    <div class="user-content pt-3 mb-4 text-gray-600 max-w-full line-clamp-6"
+      x-ref="content"
+      :class="{ 'line-clamp-6': clamp }"
+      @click="toggleClamp()"
+      style="word-break: break-word;">
       {!! $model->content_html !!}
     </div>
     <footer>

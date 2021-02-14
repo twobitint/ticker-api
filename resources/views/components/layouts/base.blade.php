@@ -19,5 +19,23 @@
     {{ $slot }}
 
     <x-footer/>
+
+    <!-- Temporary JS -->
+    <script>
+      function post() {
+        return {
+          clamp: true,
+          toggleClamp() {
+            const el = this.$refs.content
+            if (this.clamp && el.scrollHeight > el.clientHeight) {
+              this.clamp = false
+            } else if (!this.clamp) {
+              this.clamp = true
+            }
+          }
+        }
+      }
+    </script>
+
   </body>
 </html>
