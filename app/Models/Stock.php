@@ -78,9 +78,19 @@ class Stock extends Model
     {
         $stock = self::where('symbol', $symbol)->first();
 
-        // Do not run this update if the data is newer than 15 minutes.
-        if ($stock && $stock->updated_at && $stock->updated_at->diffInMinutes(now()) <= 15) {
-            return $stock;
+        // We might not want to update a stock we already have.
+        if ($stock) {
+
+            // Do not run this update if the data is newer than 15 minutes.
+            if ($stock->updated_at->diffInMinutes(now()) <= 15) {
+                return $stock;
+            }
+
+            // Do not update if the last update was outside of market hours.
+            $ny = $stock->updated_at->setTimezone('America/New_York');
+            if ($ny->hour >= 16 || ($ny->hour < 6 && $ny->minute < 30) || $ny->dayOfWeek >= 6) {
+                return $stock;
+            }
         }
 
         // Try to http query yahoo finance data.
