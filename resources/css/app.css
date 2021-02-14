@@ -3,7 +3,13 @@
 @tailwind utilities;
 
 @layer components {
-    .user-content p {
+    .post .user-content p {
         @apply mb-4;
+    }
+    .post .user-content h1 {
+        @apply font-medium;
+    }
+    .post .user-content ul {
+        @apply list-disc list-inside;
     }
 }

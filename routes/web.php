@@ -66,7 +66,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return view('home', [
             'posts' => App\Models\Post::with('stocks')
-                ->latest()
+                ->orderBy('posted_at', 'desc')
                 ->paginate(),
         ]);
     })->name('home');
@@ -80,7 +80,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cat/{cat}', function ($cat) {
         return view('home', [
             'posts' => App\Models\Post::whereIn('subcategory', config('categories.'.$cat))
-                ->latest()
+                ->orderBy('posted_at', 'desc')
                 ->paginate(),
         ]);
     })->name('cat');

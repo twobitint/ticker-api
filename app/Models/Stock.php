@@ -21,7 +21,8 @@ class Stock extends Model
 
     public function posts()
     {
-        return $this->belongsToMany(Post::class);
+        return $this->belongsToMany(Post::class)
+            ->orderBy('posted_at', 'desc');
     }
 
     public function usersHolding()

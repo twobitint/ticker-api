@@ -29,7 +29,7 @@ class Post extends Model
         $html = preg_replace('#<a.*?>.*?</a>#i', '', $this->content);
 
         // Remove other stuff.
-        return strip_tags($html, ['p', 'br']);
+        return strip_tags($html, ['p', 'br', 'ul', 'li', 'h1']);
     }
 
     public function getHeroIconNameAttribute()
