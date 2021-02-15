@@ -6,6 +6,7 @@ use App\Reddit;
 use App\Models\Stock;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Post extends Model
 {
@@ -102,10 +103,18 @@ class Post extends Model
         // the $ in this case.
         preg_match_all('/\b[A-Z]{2,5}\b/', $string, $matches);
         $found = array_merge(array_filter($matches[0], function ($symbol) {
-            return !in_array($symbol, config('stocks.symbols.ignored'));
+            return !in_array($symbol, $this->ignoredSymbols());
         }), $found);
         // Return only one of earch symbol.
         return array_unique($found, SORT_REGULAR);
+    }
+
+    private function ignoredSymbols()
+    {
+        return array_merge(
+            config('stocks.symbols.ignored'),
+            DB::table('failed_symbol_lookups')->pluck('symbol')->toArray()
+        );
     }
 
     public function getPotentialSymbolsAttribute()

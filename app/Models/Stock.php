@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -96,6 +97,11 @@ class Stock extends Model
      */
     public static function fromYahoo($symbol)
     {
+        // Ignore symbol if it's already in the failed lookup table.
+        if (DB::table('failed_symbol_lookups')->where('symbol', '=', $symbol)->count() != 0) {
+            return null;
+        }
+
         $stock = self::where('symbol', $symbol)->first();
 
         // We might not want to update a stock we already have.
@@ -119,6 +125,11 @@ class Stock extends Model
 
         // Yahoo data not available. Should probably stop looking.
         if (!$inc) {
+            DB::table('failed_symbol_lookups')->insert([
+                'symbol' => $symbol,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
             Log::info('Yahoo Symbol Lookup FAILED for: ' . $symbol);
             return null;
         }

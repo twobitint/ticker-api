@@ -71,6 +71,8 @@ return [
             // Common.
             'EV',
             'AI',
+            'CSV',
+            'API',
         ],
     ],
     'ignored_phrases' => [
