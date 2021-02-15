@@ -28,6 +28,10 @@ class Kernel extends ConsoleKernel
             \App\Reddit::updateRising('pennystocks');
             \App\Reddit::updateRising('stocks');
         })->everyFiveMinutes();
+
+        $schedule->call(function () {
+            \App\Reddit::updateRecentPosts();
+        })->everyMinute();
     }
 
     /**
