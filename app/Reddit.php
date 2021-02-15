@@ -7,38 +7,18 @@ use Illuminate\Support\Facades\Http;
 
 class Reddit
 {
-    /**
-     * This is the main method used to run background updates for
-     * post data. Since this is query heavy, and we don't really care that much
-     * about what happens here, limit the impact by only updating a subset.
-     */
-    public static function updateRecentPosts()
-    {
-        // Some update rules:
-        //   - Don't update a post that's over a week old
-        //   - Don't update a post that's been updated in the last 15 minutes
-        //   - Only update up to 10 posts per call
-        //   - Prefer higher scoring posts
-        $posts = Post::where('posted_at', '>', now()->subDays(7))
-            ->where('updated_at', '<', now()->subMinutes(15))
-            ->orderBy('score', 'desc')
-            ->limit(10)
-            ->get();
-
-        self::updatePosts($posts);
-    }
-
     public static function updatePosts($posts)
     {
         foreach ($posts as $post) {
             self::updatePost($post);
         }
+        return $posts;
     }
 
     public static function updatePost($post)
     {
         $data = Http::get($post->url . '.json')->json('0.data.children.0.data');
-        self::postFromData($data);
+        return self::postFromData($data);
     }
 
     public static function updateRising($sub)
@@ -51,9 +31,13 @@ class Reddit
             return;
         }
 
+        $posts = [];
         foreach ($results as $result) {
-            self::postFromData($result['data']);
+            if ($post = self::postFromData($result['data'])) {
+                $posts[] = $post;
+            }
         }
+        return $posts;
     }
 
     protected static function postFromData($data)
@@ -77,9 +61,19 @@ class Reddit
         $post->author = $data['author'];
         $post->category = strtolower($data['subreddit']);
         $post->subcategory = self::cleanFlair($data['link_flair_text'] ?? null);
+        $post->comment_count = $data['num_comments'] ?? null;
         $post->posted_at = $data['created_utc'];
         $post->score = $data['score'];
         $post->score_confidence = $data['upvote_ratio'];
+
+        // We're going to set our own score based on sub size to try to
+        // normalize things a bit.
+        $quarterDaysOld = $post->posted_at->diffInMinutes(now()) / (60 * 8);
+        $weightedScore = $post->score * 10 / log($data['subreddit_subscribers']);
+        $post->popularity = $weightedScore / pow(max(0, $quarterDaysOld - 2) + 1, 1.8);
+
+        //$post->score = (int)(sqrt($data['score'] * 4 / log($data['subreddit_subscribers'])));
+
 
         $post->save();
 

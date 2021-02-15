@@ -3,6 +3,15 @@
 return [
     'symbols' => [
 
+        // Usually these symbols are tangential, so they can be safely ignored
+        // if they are mentioned within content.
+        'ignored_in_content' => [
+            'AMZN',
+            'AAPL',
+            'MSFT',
+            'TSLA',
+        ],
+
         // List of symbols to not try to process as an actual stock,
         // because they are common terms in the community typically not related to
         // a stock.
@@ -27,6 +36,7 @@ return [
             'REIT',
             'EPS',
             'PDT',
+            'RSI',
             // Sub Terms.
             'DD',
             'BUY',
@@ -43,18 +53,28 @@ return [
             'CONS',
             'PRO',
             'CON',
+            'EDIT',
             // Orgs.
             'CDC',
             'FBI',
             'IRS',
             'NSA',
             'CIA',
+            'SFT',
+            'UBS',
             // Places.
             'CA',
             'UK',
             'US',
             'USA',
             'MN',
+            // Common.
+            'EV',
+            'AI',
         ],
+    ],
+    'ignored_phrases' => [
+        'Regulation SHO',
+        'TD Bank',
     ],
 ];

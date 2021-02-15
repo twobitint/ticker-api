@@ -30,7 +30,8 @@ class Kernel extends ConsoleKernel
         })->everyFiveMinutes();
 
         $schedule->call(function () {
-            \App\Reddit::updateRecentPosts();
+            \App\Models\Post::updateRecent();
+            \App\Models\Stock::updateTrending();
         })->everyMinute();
     }
 

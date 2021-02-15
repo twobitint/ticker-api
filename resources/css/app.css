@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    body {
+        font-family: Trebuchet MS;
+    }
+}
+
 @layer components {
     .post .user-content p {
         @apply mb-4;

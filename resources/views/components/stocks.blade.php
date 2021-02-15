@@ -11,7 +11,7 @@
           {{ $stock->name }}
         </div>
         <div class="text-xs text-gray-400">
-          {{ $stock->posts_count }} posts
+          {{ $stock->posts_sum_popularity }}
         </div>
       </div>
       <div class="w-20 flex-none text-right">

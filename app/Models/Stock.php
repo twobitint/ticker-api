@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class Stock extends Model
 {
@@ -22,7 +23,7 @@ class Stock extends Model
     public function posts()
     {
         return $this->belongsToMany(Post::class)
-            ->orderBy('posted_at', 'desc');
+            ->orderBy('popularity', 'desc');
     }
 
     public function usersHolding()
@@ -50,7 +51,7 @@ class Stock extends Model
         if ($this->market_cap < 1000000) {
             // Anything less than a million
             return number_format($this->market_cap);
-        } else if ($this->market_cap < 1000000000) {
+        } elseif ($this->market_cap < 1000000000) {
             // Anything less than a billion
             return number_format($this->market_cap / 1000000, 2) . 'M';
         } else {
@@ -61,13 +62,13 @@ class Stock extends Model
 
     public static function trending($owned = false)
     {
-        $builder = self::withCount(['posts' => function (Builder $query) use ($owned) {
+        $builder = self::withSum(['posts' => function (Builder $query) use ($owned) {
             // if (!$owned) {
             //     $query->where('posted_at', '>=', now()->subDay());
             // } else {
                 $query->where('posted_at', '>=', now()->subDays(5));
             //}
-        }]);
+        }], 'popularity');
 
         if ($owned) {
             $builder->whereHas('usersHolding', function (Builder $query) {
@@ -75,10 +76,18 @@ class Stock extends Model
             });
         }
 
-        return $builder->orderBy('posts_count', 'desc')
-            ->having('posts_count', '>', 0)
+        return $builder->orderBy('posts_sum_popularity', 'desc')
+//            ->having('posts_sum_score', '>', 0)
             ->limit(5)
             ->get();
+    }
+
+    public static function updateTrending()
+    {
+        $trending = self::trending();
+        foreach ($trending as $stock) {
+            Post::updateList($stock->posts);
+        }
     }
 
     /**
@@ -91,7 +100,6 @@ class Stock extends Model
 
         // We might not want to update a stock we already have.
         if ($stock) {
-
             // Do not run this update if the data is newer than 15 minutes.
             if ($stock->updated_at->diffInMinutes(now()) <= 15) {
                 return $stock;
@@ -109,8 +117,14 @@ class Stock extends Model
             ->json('optionChain.result');
         $inc = $results[0]['quote'] ?? false;
 
+        // Yahoo data not available. Should probably stop looking.
+        if (!$inc) {
+            Log::info('Yahoo Symbol Lookup FAILED for: ' . $symbol);
+            return null;
+        }
+
         // Incoming data is not formatted how we expect. No update possible.
-        if (!$inc || !isset($inc['longName'])) {
+        if (!isset($inc['longName'])) {
             return $stock;
         }
 
