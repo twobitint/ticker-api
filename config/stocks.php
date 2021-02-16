@@ -55,6 +55,8 @@ return [
             'PRO',
             'CON',
             'EDIT',
+            'BEAT',
+            'ALOT',
             // Orgs.
             'CDC',
             'FBI',
