@@ -37,6 +37,11 @@ class Stock extends Model
         return $this->belongsToMany(User::class, 'watchlist')->using(Watcher::class);
     }
 
+    public function getMarkedAttribute()
+    {
+        return Auth::user()->stocksInPositions->contains($this);
+    }
+
     public function getColorAttribute()
     {
         return substr(md5($this->symbol), 0, 6);
@@ -61,18 +66,18 @@ class Stock extends Model
         }
     }
 
-    public static function trending($owned = false)
+    public static function trending($type = 'all')
     {
-        $builder = self::withSum(['posts' => function (Builder $query) use ($owned) {
-            // if (!$owned) {
-            //     $query->where('posted_at', '>=', now()->subDay());
-            // } else {
-                $query->where('posted_at', '>=', now()->subDays(5));
-            //}
+        $builder = self::withSum(['posts' => function (Builder $query) {
+            $query->where('posted_at', '>=', now()->subDays(7));
         }], 'popularity');
 
-        if ($owned) {
+        if ($type == 'positions') {
             $builder->whereHas('usersHolding', function (Builder $query) {
+                $query->where('users.id', '=', Auth::id());
+            });
+        } elseif ($type == 'watchlist') {
+            $builder->whereHas('usersWatching', function (Builder $query) {
                 $query->where('users.id', '=', Auth::id());
             });
         }

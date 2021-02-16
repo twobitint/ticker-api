@@ -11,7 +11,7 @@
     </div>
   </header>
   <p class="font-bold text-gray-700">
-    <a href="{{ $model->url }}">{!! $model->title !!}</a>
+    {!! $model->title !!}
   </p>
   {{-- There is a bug with grid and word break that has to be handled via inline style here --}}
   <div class="user-content pt-3 mb-4 text-gray-600 max-w-full line-clamp-6 text-justify"
@@ -22,22 +22,23 @@
     {!! $model->content_html !!}
   </div>
   <footer>
-    <div class="flex flex-wrap -m-0.5">
-      @foreach ($model->stocks as $stock)
-        <x-stock :model="$stock"/>
-      @endforeach
-    </div>
-
-    <div class="flex mt-6">
-      <a href="" class="flex rounded-full p-2 hover:bg-gray-200 mr-4">
+    <div class="flex mt-6 items-center">
+      <a href="{{ $model->url }}" class="flex rounded-full p-2 hover:bg-gray-200 mr-4">
         <x-heroicon-s-thumb-up class="w-5 h-5 text-gray-500"/>
-        <span class="font-bold text-gray-500">{{ $model->popularity }}</span>
+        <span class="font-bold text-gray-500">{{ $model->score }}</span>
       </a>
 
-      <a href="" class="flex rounded-full p-2 hover:bg-gray-200 mr-4">
+      <a href="{{ $model->url }}" class="flex rounded-full p-2 hover:bg-gray-200 mr-4">
         <x-heroicon-s-chat-alt class="w-5 h-5 text-gray-500"/>
         <span class="font-bold text-gray-500">{{ $model->comment_count }}</span>
       </a>
+
+      @foreach ($model->stocks->take(4) as $stock)
+        <x-stock :model="$stock"/>
+      @endforeach
+      {{-- @if ($model->stocks->count() > 4)
+        <x-heroicon-s-dots-horizontal class="w-6 h-6 pt-2 text-gray-500"/>
+      @endif --}}
     </div>
   </footer>
 </article>

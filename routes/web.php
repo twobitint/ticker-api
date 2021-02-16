@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\WatchlistController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,6 +33,8 @@ Route::middleware('auth')->group(function () {
             ->paginate(),
     ])->name('home');
 
+    Route::view('/watchlist', 'watchlist')->name('watchlist');
+
     Route::get('stock/{stock:symbol}', function (App\Models\Stock $stock) {
         return view('stock', [
             'stock' => $stock,
@@ -48,6 +52,14 @@ Route::middleware('auth')->group(function () {
     Route::get('logout', [AuthController::class, 'logout'])
         ->name('logout');
 
+    // Form Routes.
     Route::post('user/upload-positions', [UploadController::class, 'handlePositions'])
         ->name('upload-positions');
+
+    Route::get('user/watchlist/{stock:symbol}/add', [WatchlistController::class, 'handleAdd'])
+        ->name('watchlist.add');
+    Route::get('user/watchlist/{stock:symbol}/remove', [WatchlistController::class, 'handleRemove'])
+        ->name('watchlist.remove');
+
+    Route::get('search', [SearchController::class, 'handle'])->name('search');
 });

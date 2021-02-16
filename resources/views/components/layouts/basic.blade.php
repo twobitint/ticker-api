@@ -3,7 +3,6 @@
     <nav class="container mx-auto flex justify-between items-center">
 
       <section class="flex-none w-1/4">
-        {{-- <img class="max-h-16 w-auto" src="logo.svg" alt="Workflow"> --}}
         <x-logo class="max-h-16 w-auto"/>
       </section>
 
@@ -22,4 +21,4 @@
       {{ $slot }}
     </main>
   </div>
-</x-layouts-base>
+</x-layouts.base>

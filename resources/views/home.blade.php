@@ -2,7 +2,7 @@
   <x-navbar/>
   <div class="container mx-auto grid grid-cols-12 gap-4 pt-10 mb-20">
     <section class="col-span-2">
-      <x-menu/>
+      <x-menus.main/>
     </section>
     <section class="col-span-6 grid gap-4">
       <div class="inline-flex shadow rounded-md font-bold">

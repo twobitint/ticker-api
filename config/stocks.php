@@ -37,6 +37,7 @@ return [
             'EPS',
             'PDT',
             'RSI',
+            'USD',
             // Sub Terms.
             'DD',
             'BUY',

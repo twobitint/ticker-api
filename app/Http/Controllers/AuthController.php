@@ -23,7 +23,7 @@ class AuthController extends Controller
             $user->name = 'Emma Fake';
             $user->picture_url = 'https://randomuser.me/api/portraits/thumb/women/75.jpg';
             $user->save();
-            Auth::login($user);
+            Auth::login($user, true);
             return redirect()->route('home');
         }
         // Use actual google auth.
@@ -41,7 +41,7 @@ class AuthController extends Controller
         $user->google_id = $google->id;
         $user->save();
 
-        Auth::login($user);
+        Auth::login($user, true);
         return redirect()->route('home');
     }
 }

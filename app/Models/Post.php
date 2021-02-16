@@ -22,17 +22,21 @@ class Post extends Model
 
     public function stocks()
     {
-        return $this->belongsToMany(Stock::class);
+        return $this->belongsToMany(Stock::class)
+            ->withSum(['posts' => function ($query) {
+                $query->where('posted_at', '>', now()->subDays(7));
+            }], 'popularity')
+            ->orderBy('posts_sum_popularity', 'desc');
     }
 
     public function getContentHtmlAttribute()
     {
         $html = $this->content;
 
-        /*
+
         // Remove links.
         $html = preg_replace('#<a.*?>.*?</a>#i', '', $html);
-        */
+
 
         // Remove other stuff.
         return strip_tags($html, ['p', 'br', 'ul', 'li', 'h1', 'a']);

@@ -30,7 +30,7 @@
                 ? 'text-green-700'
                 : 'text-red-700'
             }}"/>
-          {{ abs(number_format($stock->regular_market_change_percent, 2)) }}%
+          {{ number_format(abs($stock->regular_market_change_percent), 2) }}%
         </div>
       </div>
       <x-heroicon-o-plus-circle class="flex-none w-6 h-6 text-gray-500 ml-2"/>
