@@ -39,7 +39,8 @@ class Stock extends Model
 
     public function getMarkedAttribute()
     {
-        return Auth::user()->stocksInPositions->contains($this);
+        return Auth::user()->stocksInWatchlist->contains($this)
+            || Auth::user()->stocksInPositions->contains($this);
     }
 
     public function getColorAttribute()

@@ -10,12 +10,12 @@
       :class="{ 'bg-gray-200': trending === 'watchlist', 'font-medium': trending === 'watchlist' }"
       href="#"
       @click="trending = 'watchlist'"
-    >Your Watchlist</a>
+    >Watchlist</a>
     <a class="rounded-full py-1 px-3 m-0.5 border border-gray-300"
       :class="{ 'bg-gray-200': trending === 'mine', 'font-medium': trending === 'mine' }"
       href="#"
       @click="trending = 'mine'"
-    >Your Positions</a>
+    >Positions</a>
   </div>
   <x-stocks x-show="trending === 'all'" :list="App\Models\Stock::trending()"/>
   <x-stocks x-show="trending === 'mine'" :list="App\Models\Stock::trending('positions')"/>
