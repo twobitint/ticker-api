@@ -1,11 +1,14 @@
-<article class="post bg-white rounded-md shadow p-6" x-data="post()">
-  <header class="flex mb-4">
+<article class="post rounded-md shadow p-6 relative overflow-hidden {{ $model->hot ? 'bg-red-50' : 'bg-white' }}" x-data="post()">
+  @if ($model->hot)
+    <x-heroicon-o-fire class="absolute text-red-900 opacity-10" style="height: 400px; width: 400px; bottom: -100px; right: -100px;" />
+  @endif
+  <header class="flex mb-4 items-center space-x-2">
     <div title="{{ $model->subcategory }}">
       <x-dynamic-component
         :component="'heroicon-o-' . $model->hero_icon_name"
         class="w-9 h-9 text-gray-500"/>
     </div>
-    <div class="ml-2">
+    <div>
       <p class="font-semibold text-sm">r/{{ $model->category }}</p>
       <p class="text-gray-600 text-sm">{{ $model->posted_at->diffForHumans() }}</p>
     </div>

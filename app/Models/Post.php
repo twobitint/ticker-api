@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Reddit;
-use App\Models\Stock;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -22,11 +21,16 @@ class Post extends Model
 
     public function stocks()
     {
-        return $this->belongsToMany(Stock::class)
-            ->withSum(['posts' => function ($query) {
-                $query->where('posted_at', '>', now()->subDays(7));
-            }], 'popularity')
-            ->orderBy('posts_sum_popularity', 'desc');
+        return $this->belongsToMany(Stock::class);
+            // ->withSum(['posts' => function ($query) {
+            //     $query->where('posted_at', '>', now()->subDays(7));
+            // }], 'popularity')
+            // ->orderBy('posts_sum_popularity', 'desc');
+    }
+
+    public function getHotAttribute()
+    {
+        return $this->popularity >= 50;
     }
 
     public function getContentHtmlAttribute()
@@ -137,6 +141,9 @@ class Post extends Model
         $ids = [];
         foreach ($this->potentialSymbols as $symbol) {
             if ($stock = Stock::fromYahoo($symbol)) {
+                // Take a snapshot.
+                StockSnapshot::createFromStock($stock);
+
                 $ids[] = $stock->id;
             }
         }

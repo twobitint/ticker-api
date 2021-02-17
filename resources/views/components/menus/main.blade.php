@@ -1,5 +1,5 @@
 <nav class="grid gap-2">
-  <a href="/" class="{{ request()->is('/') ? 'bg-gray-300 rounded' : '' }} flex items-center p-2">
+  <a href="" class="{{ request()->is('/') ? 'bg-gray-300 rounded' : '' }} flex items-center p-2">
     <x-heroicon-o-home class="w-6 h-6 mr-3"/>
     <span class="font-semibold">Home</span>
   </a>
@@ -18,8 +18,8 @@
 </div>
 <nav class="grid gap-1 font-semibold">
   @foreach (config('categories') as $cat => $subs)
-    <a class="capitalize px-2 py-1 {{ request()->is('cat/' . $cat) ? 'bg-gray-300 rounded' : '' }}"
-      href="{{ route('cat', ['cat' => $cat]) }}"
+    <a class="capitalize px-2 py-1 {{ request()->query('category') == $cat ? 'bg-gray-300 rounded' : '' }}"
+      href="{{ route('home', array_merge(request()->query(), ['category' => $cat])) }}"
     >
       {{ $cat }}
     </a>

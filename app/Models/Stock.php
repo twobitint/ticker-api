@@ -21,6 +21,16 @@ class Stock extends Model
         'earnings' => 'datetime',
     ];
 
+    public function snapshots()
+    {
+        return $this->hasMany(StockSnapshot::class);
+    }
+
+    public function snapshot()
+    {
+        return $this->hasOne(StockSnapshot::class)->orderBy('id', 'desc');
+    }
+
     public function posts()
     {
         return $this->belongsToMany(Post::class)
@@ -69,24 +79,21 @@ class Stock extends Model
 
     public static function trending($type = 'all')
     {
-        $builder = self::withSum(['posts' => function (Builder $query) {
-            $query->where('posted_at', '>=', now()->subDays(7));
-        }], 'popularity');
+        $builder = StockSnapshot::with('stock');
 
         if ($type == 'positions') {
-            $builder->whereHas('usersHolding', function (Builder $query) {
-                $query->where('users.id', '=', Auth::id());
-            });
+            $builder->whereIn('stock_id', Auth::user()->stocksInPositions->pluck('id'));
         } elseif ($type == 'watchlist') {
-            $builder->whereHas('usersWatching', function (Builder $query) {
-                $query->where('users.id', '=', Auth::id());
-            });
+            $builder->whereIn('stock_id', Auth::user()->stocksInWatchlist->pluck('id'));
         }
 
-        return $builder->orderBy('posts_sum_popularity', 'desc')
-//            ->having('posts_sum_score', '>', 0)
+        return $builder
+            ->groupBy('stock_id')
+            ->selectRaw('stock_id, MAX(id)')
+            ->orderBy('popularity', 'desc')
             ->limit(5)
-            ->get();
+            ->get()
+            ->pluck('stock');
     }
 
     public static function updateTrending()

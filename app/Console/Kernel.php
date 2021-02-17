@@ -27,12 +27,17 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             \App\Reddit::updateRising('pennystocks');
             \App\Reddit::updateRising('stocks');
-        })->everyFiveMinutes();
+        })->everyMinute();
+
+        // $schedule->call(function () {
+        //     \App\Reddit::updateHot('pennystocks');
+        //     \App\Reddit::updateHot('stocks');
+        // })->everyFifteenMinutes();
 
         $schedule->call(function () {
             \App\Models\Post::updateRecent();
             \App\Models\Stock::updateTrending();
-        })->everyMinute();
+        })->everyFiveMinutes();
     }
 
     /**

@@ -21,10 +21,20 @@ class Reddit
         return self::postFromData($data);
     }
 
+    public static function updateHot($sub)
+    {
+        return self::updateSub($sub, 'hot');
+    }
+
     public static function updateRising($sub)
     {
+        return self::updateSub($sub, 'rising');
+    }
+
+    protected static function updateSub($sub, $type)
+    {
         // Try to http query reddit post data.
-        $results = Http::get('https://reddit.com/r/' . $sub . '/rising.json')
+        $results = Http::get('https://reddit.com/r/' . $sub . '/' . $type . '.json')
             ->json('data.children');
 
         if (!$results) {

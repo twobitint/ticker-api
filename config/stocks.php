@@ -57,6 +57,7 @@ return [
             'EDIT',
             'BEAT',
             'ALOT',
+            'FREE',
             // Orgs.
             'CDC',
             'FBI',

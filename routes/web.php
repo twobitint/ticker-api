@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\WatchlistController;
@@ -27,11 +28,7 @@ Route::get('login/google/redirect', [AuthController::class, 'redirect']);
 // Protect all the app routes.
 Route::middleware('auth')->group(function () {
 
-    Route::view('/', 'home', [
-        'posts' => App\Models\Post::with('stocks')
-            ->orderBy('posted_at', 'desc')
-            ->paginate(),
-    ])->name('home');
+    Route::get('/', [HomeController::class, 'handle'])->name('home');
 
     Route::view('/watchlist', 'watchlist')->name('watchlist');
 
@@ -62,4 +59,13 @@ Route::middleware('auth')->group(function () {
         ->name('watchlist.remove');
 
     Route::get('search', [SearchController::class, 'handle'])->name('search');
+
+    Route::get('test', function () {
+        App\Models\Stock::trending('positions');
+        // $builder = App\Models\Post::with('stocks')
+        //     ->orderBy('posted_at', 'desc');
+
+        // $posts = $builder->paginate();
+        // $posts->first()->stocks->first();
+    });
 });

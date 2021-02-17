@@ -6,8 +6,11 @@
     </section>
     <section class="col-span-6 grid gap-4">
       <div class="inline-flex shadow rounded-md font-bold">
-        <a href="#" class="flex-1 text-center px-2 py-4 rounded-l-md border-r border-gray-200 bg-white">Recent</a>
-        <a href="#" class="flex-1 text-center px-2 py-4 bg-white border-r border-gray-200 text-gray-500">Most Liked</a>
+        <a href="{{ route('home', ['sort' => 'posted_at']) }}"
+          class="flex-1 text-center px-2 py-4 bg-white rounded-l-md border-r border-gray-200 {{ request()->query('sort') == 'posted_at' ? '' : 'text-gray-500' }}"
+        >Recent</a>
+        <a href="{{ route('home', ['sort' => 'popularity']) }}"
+          class="flex-1 text-center px-2 py-4 bg-white border-r border-gray-200 {{ request()->query('sort') == 'popularity' ? '' : 'text-gray-500' }}">Hot</a>
         <a href="#" class="flex-1 text-center px-2 py-4 rounded-r-md bg-white text-gray-500">Most Answers</a>
       </div>
       @foreach ($posts as $post)
