@@ -21,6 +21,8 @@ class Stock extends Model
         'earnings' => 'datetime',
     ];
 
+    private $_popularityGraph;
+
     public function snapshots()
     {
         return $this->hasMany(StockSnapshot::class);
@@ -29,6 +31,37 @@ class Stock extends Model
     public function snapshot()
     {
         return $this->hasOne(StockSnapshot::class)->orderBy('id', 'desc');
+    }
+
+    /**
+     * The result of this function is cached as it is used repeatedly
+     * and laravel won't cache accessor functions by default.
+     */
+    public function getPopularityGraphAttribute($force = false)
+    {
+        if (!$this->_popularityGraph || $force) {
+            $this->load(['snapshots' => function ($query) {
+                $query->where('time', '>', now()->subDays(7));
+            }]);
+
+            $this->_popularityGraph = $this->snapshots->pluck('popularity');
+        }
+        return $this->_popularityGraph;
+    }
+
+    public function getPopularityGraphLowAttribute()
+    {
+        return $this->popularityGraph->min() + $this->popularitySpread();
+    }
+
+    public function getPopularityGraphHighAttribute()
+    {
+        return $this->popularityGraph->max() + $this->popularitySpread();
+    }
+
+    private function popularitySpread()
+    {
+        return ($this->popularityGraph->max() - $this->popularityGraph->min()) / 2;
     }
 
     public function posts()

@@ -14,7 +14,14 @@
           {{ $stock->posts_sum_popularity }}
         </div>
       </div>
-      <div class="w-20 flex-none text-right">
+
+      @php
+        $chartId = md5(rand())
+      @endphp
+
+      <div class="ct-chart" style="width: 150px;" id="stock-chart-{{ $chartId }}"></div>
+
+      {{-- <div class="w-20 flex-none text-right">
         ${{ number_format($stock->regular_market_price, 2) }}
       </div>
       <div class="w-24 flex-none flex flex-row-reverse">
@@ -33,7 +40,43 @@
           {{ number_format(abs($stock->regular_market_change_percent), 2) }}%
         </div>
       </div>
-      <x-heroicon-o-plus-circle class="flex-none w-6 h-6 text-gray-500 ml-2"/>
+      <x-heroicon-o-plus-circle class="flex-none w-6 h-6 text-gray-500 ml-2"/> --}}
     </a>
+    {{-- <div class="w-full h-20">
+      <div class="ct-chart" id="stock-chart-{{ $stock->symbol }}"></div>
+    </div> --}}
+    <script>
+      new Chartist.Line('#stock-chart-{{ $chartId }}', {
+        series: [
+          //[200, 187, 176, 154, 111, 109, 123, 134, 198, 193, 179],
+          //{{ $stock->snapshots->pluck('popularity') }}
+          {{ $stock->popularityGraph }}
+        ]
+      }, {
+        axisX: {
+          offset: 0,
+          showLabel: false,
+          showGrid: false,
+        },
+        axisY: {
+          offset: 0,
+          showLabel: false,
+          showGrid: false,
+        },
+        fullWidth: true,
+        showPoint: false,
+        lineSmooth: false,
+        //showArea: true,
+        height: 50,
+        high: {{ $stock->popularityGraphHigh }},
+        low: {{ $stock->popularityGraphLow }},
+        chartPadding: {
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+        },
+      });
+    </script>
   @endforeach
 </div>

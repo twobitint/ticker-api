@@ -19,3 +19,9 @@
         @apply list-disc list-inside;
     }
 }
+
+@layer utilities {
+    .ct-chart .ct-line {
+        stroke-width: 1px;
+    }
+}
