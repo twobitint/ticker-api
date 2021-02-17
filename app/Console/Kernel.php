@@ -24,20 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            \App\Reddit::updateRising('pennystocks');
-            \App\Reddit::updateRising('stocks');
-        })->everyMinute();
-
-        // $schedule->call(function () {
-        //     \App\Reddit::updateHot('pennystocks');
-        //     \App\Reddit::updateHot('stocks');
-        // })->everyFifteenMinutes();
-
-        $schedule->call(function () {
-            \App\Models\Post::updateRecent();
-            \App\Models\Stock::updateTrending();
-        })->everyFiveMinutes();
+        $schedule->command(\App\Console\Commands\Update::class)->everyMinute();
     }
 
     /**

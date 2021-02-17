@@ -33,7 +33,7 @@ class StockSnapshot extends Model
 
         $popularity = $stock->posts->reduce(function ($carry, $post) {
             return $post->popularity + $carry;
-        });
+        }, 0);
 
         $snapshot->popularity = $popularity;
         $snapshot->stock_id = $stock->id;

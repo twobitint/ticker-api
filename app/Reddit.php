@@ -9,8 +9,22 @@ class Reddit
 {
     public static function updatePosts($posts)
     {
-        foreach ($posts as $post) {
-            self::updatePost($post);
+        $names = $posts->pluck('url')->map(function ($url) {
+            preg_match('/comments\/(.{6})/', $url, $matches);
+            return 't3_'.$matches[1];
+        });
+        $results = Http::get('https://reddit.com/by_id/' . $names->implode(',') . '.json')
+            ->json('data.children');
+
+        if (!$results) {
+            return;
+        }
+
+        $posts = [];
+        foreach ($results as $result) {
+            if ($post = self::postFromData($result['data'])) {
+                $posts[] = $post;
+            }
         }
         return $posts;
     }

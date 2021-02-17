@@ -33,6 +33,11 @@ class Stock extends Model
         return $this->hasOne(StockSnapshot::class)->orderBy('id', 'desc');
     }
 
+    public function getPopularityAttribute()
+    {
+        return $this->snapshot->popularity;
+    }
+
     /**
      * The result of this function is cached as it is used repeatedly
      * and laravel won't cache accessor functions by default.
@@ -45,32 +50,35 @@ class Stock extends Model
             }]);
 
             $now = now();
-            $snapshots = $this->snapshots->groupBy(function ($item) use ($now) {
-                return $now->diffInHours($item->time);
+            $snapshots = $this->snapshots->groupBy(function ($snap) use ($now) {
+                return $now->diffInMinutes($snap->time);
+            })->map(function ($snaps) {
+                return (int)$snaps->avg('popularity');
             });
 
+            $steps = 60; //24 * 7;
             $points = [];
             $x1 = 0;
             $y1 = 0;
-            for ($hour = 0; $hour < 168; $hour++) {
-                if ($snapshots->has(168 - $hour)) {
-                    $points[] = $snapshots[168 - $hour]->avg('popularity');
+            for ($i = 0; $i < $steps; $i++) {
+                if ($snapshots->has($steps - $i)) {
+                    $points[] = $snapshots[$steps - $i];
                 } else {
                     $noise = rand(-5, 5);
-                    if ($hour == 0) {
+                    if ($i == 0) {
                         $points[] = $noise;
                     } else {
                         // linear interpolation.
-                        if ($hour >= $x1) {
-                            for ($x1 = $hour; $x1 < 168; $x1++) {
-                                if ($snapshots[168 - $x1] ?? false) {
-                                    $y1 = $snapshots[168 - $x1]->avg('popularity');
+                        if ($i >= $x1) {
+                            for ($x1 = $i; $x1 < $steps; $x1++) {
+                                if ($snapshots[$steps - $x1] ?? false) {
+                                    $y1 = $snapshots[$steps - $x1];
                                     break;
                                 }
                             }
                         }
-                        $d = 1 / ($x1 - $hour);
-                        $y = $points[$hour - 1] * (1 - $d) + $y1 * $d;
+                        $d = 1 / ($x1 - $i);
+                        $y = $points[$i - 1] * (1 - $d) + $y1 * $d;
                         $points[] = $y + $noise;
                     }
                 }
@@ -152,19 +160,34 @@ class Stock extends Model
     {
         $builder = StockSnapshot::with('stock');
 
-        if ($type == 'positions') {
-            $builder->whereIn('stock_id', Auth::user()->stocksInPositions->pluck('id'));
-        } elseif ($type == 'watchlist') {
-            $builder->whereIn('stock_id', Auth::user()->stocksInWatchlist->pluck('id'));
-        }
-
-        return $builder
-            ->groupBy('stock_id')
-            ->selectRaw('stock_id, MAX(id)')
+        return $builder->fromSub(
+            DB::table('stock_snapshots')
+                ->selectRaw('MAX(id) as id')
+                ->groupBy('stock_id'),
+            'highs'
+        )->join('stock_snapshots', 'stock_snapshots.id', '=', 'highs.id')
             ->orderBy('popularity', 'desc')
             ->limit(5)
             ->get()
             ->pluck('stock');
+
+
+        // if ($type == 'positions') {
+        //     $builder->whereIn('stock_snapshots.stock_id', Auth::user()->stocksInPositions->pluck('id'));
+        // } elseif ($type == 'watchlist') {
+        //     $builder->whereIn('stock_snapshots.stock_id', Auth::user()->stocksInWatchlist->pluck('id'));
+        // }
+
+        // $sub = DB::table('stock_snapshots')
+        //     ->selectRaw('stock_id, MAX(id)')
+        //     ->groupBy('stock_id');
+        // return $builder->joinSub($sub, 'highs', function ($join) {
+        //     $join->on('highs.stock_id', '=', 'stock_snapshots.stock_id');
+        // })
+        //     ->orderBy('popularity', 'desc')
+        //     ->limit(5)
+        //     ->get()
+        //     ->pluck('stock');
     }
 
     public static function updateTrending()
@@ -181,6 +204,9 @@ class Stock extends Model
      */
     public static function fromYahoo($symbol)
     {
+        // Make sure symbol is caps.
+        $symbol = strtoupper($symbol);
+
         // Ignore symbol if it's already in the failed lookup table.
         if (DB::table('failed_symbol_lookups')->where('symbol', '=', $symbol)->count() != 0) {
             return null;

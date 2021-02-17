@@ -166,7 +166,7 @@ class Post extends Model
         $posts = Post::where('posted_at', '>', now()->subDays(7))
             ->where('updated_at', '<', now()->subMinutes(15))
             ->latest()
-            ->limit(10)
+            ->limit(100)
             ->get();
 
         return Reddit::updatePosts($posts);
