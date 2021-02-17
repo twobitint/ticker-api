@@ -23,7 +23,7 @@ class StockSnapshot extends Model
     public static function createFromStock(Stock $stock)
     {
         $latest = self::where('stock_id', '=', $stock->id)
-            ->orderBy('time')
+            ->orderBy('time', 'desc')
             ->first();
         if ($latest && $latest->time->diffInMinutes(now()) < 15) {
             return null;

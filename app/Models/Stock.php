@@ -21,7 +21,7 @@ class Stock extends Model
         'earnings' => 'datetime',
     ];
 
-    private $_popularityGraph;
+    private $popularityGraphCache;
 
     public function snapshots()
     {
@@ -39,29 +39,67 @@ class Stock extends Model
      */
     public function getPopularityGraphAttribute($force = false)
     {
-        if (!$this->_popularityGraph || $force) {
+        if (!$this->popularityGraphCache || $force) {
             $this->load(['snapshots' => function ($query) {
                 $query->where('time', '>', now()->subDays(7));
             }]);
 
-            $this->_popularityGraph = $this->snapshots->pluck('popularity');
+            $now = now();
+            $snapshots = $this->snapshots->groupBy(function ($item) use ($now) {
+                return $now->diffInHours($item->time);
+            });
+
+            $points = [];
+            $x1 = 0;
+            $y1 = 0;
+            for ($hour = 0; $hour < 168; $hour++) {
+                if ($snapshots->has(168 - $hour)) {
+                    $points[] = $snapshots[168 - $hour]->avg('popularity');
+                } else {
+                    $noise = rand(-5, 5);
+                    if ($hour == 0) {
+                        $points[] = $noise;
+                    } else {
+                        // linear interpolation.
+                        if ($hour >= $x1) {
+                            for ($x1 = $hour; $x1 < 168; $x1++) {
+                                if ($snapshots[168 - $x1] ?? false) {
+                                    $y1 = $snapshots[168 - $x1]->avg('popularity');
+                                    break;
+                                }
+                            }
+                        }
+                        $d = 1 / ($x1 - $hour);
+                        $y = $points[$hour - 1] * (1 - $d) + $y1 * $d;
+                        $points[] = $y + $noise;
+                    }
+                }
+            }
+
+            return $points;
+
+
+            // $this->popularityGraphCache = [];
+            // foreach (now()->subDays(7)->hoursUntil(now()) as $date) {
+            //     if ($snap)
+            // }
         }
-        return $this->_popularityGraph;
+        return $this->popularityGraphCache;
     }
 
     public function getPopularityGraphLowAttribute()
     {
-        return $this->popularityGraph->min() + $this->popularitySpread();
+        return min($this->popularityGraph) + $this->popularitySpread();
     }
 
     public function getPopularityGraphHighAttribute()
     {
-        return $this->popularityGraph->max() + $this->popularitySpread();
+        return max($this->popularityGraph) + $this->popularitySpread();
     }
 
     private function popularitySpread()
     {
-        return ($this->popularityGraph->max() - $this->popularityGraph->min()) / 2;
+        return (max($this->popularityGraph) - min($this->popularityGraph)) / 2;
     }
 
     public function posts()

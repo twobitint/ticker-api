@@ -50,7 +50,7 @@
         series: [
           //[200, 187, 176, 154, 111, 109, 123, 134, 198, 193, 179],
           //{{ $stock->snapshots->pluck('popularity') }}
-          {{ $stock->popularityGraph }}
+          {{ json_encode($stock->popularityGraph) }}
         ]
       }, {
         axisX: {
