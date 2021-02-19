@@ -18,6 +18,6 @@
     >Positions</a>
   </div>
   <x-stocks x-show="trending === 'all'" :list="App\Models\Stock::trending()"/>
-  <x-stocks x-show="trending === 'mine'" :list="App\Models\Stock::trending('positions')"/>
-  <x-stocks x-show="trending === 'watchlist'" :list="App\Models\Stock::trending('watchlist')"/>
+  {{-- <x-stocks x-show="trending === 'mine'" :list="App\Models\Stock::trending('positions')"/>
+  <x-stocks x-show="trending === 'watchlist'" :list="App\Models\Stock::trending('watchlist')"/> --}}
 </section>

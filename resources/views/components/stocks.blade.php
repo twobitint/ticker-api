@@ -50,13 +50,14 @@
         series: [
           //[200, 187, 176, 154, 111, 109, 123, 134, 198, 193, 179],
           //{{ $stock->snapshots->pluck('popularity') }}
-          {{ json_encode($stock->popularityGraph) }}
+          @json($stock->popularityGraph)
         ]
       }, {
         axisX: {
           offset: 0,
           showLabel: false,
           showGrid: false,
+          type: Chartist.AutoScaleAxis,
         },
         axisY: {
           offset: 0,

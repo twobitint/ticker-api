@@ -30,7 +30,7 @@ class Post extends Model
 
     public function getHotAttribute()
     {
-        return $this->popularity >= 50;
+        return $this->popularity > 20;
     }
 
     public function getContentHtmlAttribute()
@@ -141,50 +141,10 @@ class Post extends Model
         $ids = [];
         foreach ($this->potentialSymbols as $symbol) {
             if ($stock = Stock::fromYahoo($symbol)) {
-                // Take a snapshot.
-                StockSnapshot::createFromStock($stock);
-
                 $ids[] = $stock->id;
             }
         }
 
         $this->stocks()->sync($ids);
-    }
-
-    /**
-     * This is the main method used to run background updates for
-     * post data. Since this is query heavy, and we don't really care that much
-     * about what happens here, limit the impact by only updating a subset.
-     */
-    public static function updateRecent()
-    {
-        // Some update rules:
-        //   - Don't update a post that's over a week old
-        //   - Don't update a post that's been updated in the last 15 minutes
-        //   - Only update up to 10 posts per call
-        //   - Prefer higher scoring posts
-        $posts = Post::where('posted_at', '>', now()->subDays(7))
-            ->where('updated_at', '<', now()->subMinutes(15))
-            ->latest()
-            ->limit(100)
-            ->get();
-
-        return Reddit::updatePosts($posts);
-    }
-
-    public static function updatePopular()
-    {
-        $posts = Post::where('posted_at', '>', now()->subDays(7))
-            ->where('updated_at', '<', now()->subMinutes(15))
-            ->orderBy('popularity', 'desc')
-            ->limit(10)
-            ->get();
-
-        return Reddit::updatePosts($posts);
-    }
-
-    public static function updateList($posts)
-    {
-        return Reddit::updatePosts($posts);
     }
 }

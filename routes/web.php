@@ -61,7 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::get('search', [SearchController::class, 'handle'])->name('search');
 
     Route::get('test', function () {
-        App\Models\Stock::trending('positions');
+        App\Models\Stock::trending();
         // $builder = App\Models\Post::with('stocks')
         //     ->orderBy('posted_at', 'desc');
 

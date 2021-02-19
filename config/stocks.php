@@ -38,6 +38,8 @@ return [
             'PDT',
             'RSI',
             'USD',
+            'IP',
+            'PEG',
             // Sub Terms.
             'DD',
             'BUY',
@@ -66,6 +68,7 @@ return [
             'CIA',
             'SFT',
             'UBS',
+            'TD',
             // Places.
             'CA',
             'UK',
@@ -77,10 +80,10 @@ return [
             'AI',
             'CSV',
             'API',
+            'HOME',
         ],
     ],
     'ignored_phrases' => [
         'Regulation SHO',
-        'TD Bank',
     ],
 ];

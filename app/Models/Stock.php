@@ -33,11 +33,6 @@ class Stock extends Model
         return $this->hasOne(StockSnapshot::class)->orderBy('id', 'desc');
     }
 
-    public function getPopularityAttribute()
-    {
-        return $this->snapshot->popularity;
-    }
-
     /**
      * The result of this function is cached as it is used repeatedly
      * and laravel won't cache accessor functions by default.
@@ -46,68 +41,86 @@ class Stock extends Model
     {
         if (!$this->popularityGraphCache || $force) {
             $this->load(['snapshots' => function ($query) {
-                $query->where('time', '>', now()->subDays(7));
+                $query->where('time', '>', now()->subDay());
             }]);
 
-            $now = now();
-            $snapshots = $this->snapshots->groupBy(function ($snap) use ($now) {
-                return $now->diffInMinutes($snap->time);
-            })->map(function ($snaps) {
-                return (int)$snaps->avg('popularity');
+            $this->popularityGraphCache = $this->snapshots->map(function ($snapshot) {
+                return [
+                    'x' => 60 - $snapshot->time->diffInMinutes(now()),
+                    'y' => $snapshot->popularity,
+                ];
             });
 
-            $steps = 60; //24 * 7;
-            $points = [];
-            $x1 = 0;
-            $y1 = 0;
-            for ($i = 0; $i < $steps; $i++) {
-                if ($snapshots->has($steps - $i)) {
-                    $points[] = $snapshots[$steps - $i];
-                } else {
-                    $noise = rand(-5, 5);
-                    if ($i == 0) {
-                        $points[] = $noise;
-                    } else {
-                        // linear interpolation.
-                        if ($i >= $x1) {
-                            for ($x1 = $i; $x1 < $steps; $x1++) {
-                                if ($snapshots[$steps - $x1] ?? false) {
-                                    $y1 = $snapshots[$steps - $x1];
-                                    break;
-                                }
-                            }
-                        }
-                        $d = 1 / ($x1 - $i);
-                        $y = $points[$i - 1] * (1 - $d) + $y1 * $d;
-                        $points[] = $y + $noise;
-                    }
-                }
-            }
+            // $steps = 60;
 
-            return $points;
+            // $now = now();
+            // $snapshots = $this->snapshots->groupBy(function ($snap) use ($now) {
+            //     return $now->diffInMinutes($snap->time);
+            // })->map(function ($snaps) {
+            //     return (int)$snaps->avg('popularity');
+            // });
 
+            // //return $snapshots;
 
-            // $this->popularityGraphCache = [];
-            // foreach (now()->subDays(7)->hoursUntil(now()) as $date) {
-            //     if ($snap)
+            // $points = [];
+            // $x1 = 0;
+            // $y1 = 0;
+            // $stop = false;
+            // for ($x = 0; $x < $steps; $x++) {
+            //     if ($snapshots->has($x)) {
+            //         $points[] = $snapshots[$x];
+            //     } else {
+            //         $noise = rand(-5, 5);// * 0;
+            //         // linear interpolation.
+            //         if ($x >= $x1) {
+            //             for ($x1 = $x + 1; $x1 < $steps; $x1++) {
+            //                 if ($snapshots[$x1] ?? false) {
+            //                     $y1 = $snapshots[$x1];
+            //                     break;
+            //                 }
+            //                 if ($x1 == $steps - 1) {
+            //                     $stop = true;
+            //                 }
+            //             }
+            //         }
+
+            //         if ($x == 0) {
+            //             $y = $y1;
+            //         } elseif ($stop) {
+            //             $y = $points[$x - 1];
+            //         } else {
+            //             $x0 = $x == 0 ? $x1 : $x - 1;
+            //             $y0 = $x == 0 ? $y1 : $points[$x0];
+            //             $y = ($y0 * ($x1 - $x) + $y1 * ($x - $x0)) / ($x1 - $x0);
+            //         }
+            //         $points[] = (int)$y + $noise;
+            //     }
             // }
+
+            // return array_reverse($points);
+
+
+            // // $this->popularityGraphCache = [];
+            // // foreach (now()->subDays(7)->hoursUntil(now()) as $date) {
+            // //     if ($snap)
+            // // }
         }
         return $this->popularityGraphCache;
     }
 
     public function getPopularityGraphLowAttribute()
     {
-        return min($this->popularityGraph) + $this->popularitySpread();
+        return $this->popularityGraph->min('y') - $this->popularitySpread();
     }
 
     public function getPopularityGraphHighAttribute()
     {
-        return max($this->popularityGraph) + $this->popularitySpread();
+        return $this->popularityGraph->max('y') + $this->popularitySpread();
     }
 
     private function popularitySpread()
     {
-        return (max($this->popularityGraph) - min($this->popularityGraph)) / 2;
+        return ($this->popularityGraph->max('y') - $this->popularityGraph->min('y')) / 2;
     }
 
     public function posts()
@@ -158,18 +171,25 @@ class Stock extends Model
 
     public static function trending($type = 'all')
     {
-        $builder = StockSnapshot::with('stock');
-
-        return $builder->fromSub(
-            DB::table('stock_snapshots')
-                ->selectRaw('MAX(id) as id')
-                ->groupBy('stock_id'),
-            'highs'
-        )->join('stock_snapshots', 'stock_snapshots.id', '=', 'highs.id')
+        return StockSnapshot::with('stock')
+            ->selectRaw('stock_id, SUM(popularity) as popularity')
+            ->where('time', '>', now()->subHours(6))
+            ->groupBy('stock_id')
             ->orderBy('popularity', 'desc')
             ->limit(5)
             ->get()
             ->pluck('stock');
+
+        // return $builder->fromSub(
+        //     DB::table('stock_snapshots')
+        //         ->selectRaw('MAX(id) as id')
+        //         ->groupBy('stock_id'),
+        //     'highs'
+        // )->join('stock_snapshots', 'stock_snapshots.id', '=', 'highs.id')
+        //     ->orderBy('popularity', 'desc')
+        //     ->limit(5)
+        //     ->get()
+        //     ->pluck('stock');
 
 
         // if ($type == 'positions') {
@@ -188,14 +208,6 @@ class Stock extends Model
         //     ->limit(5)
         //     ->get()
         //     ->pluck('stock');
-    }
-
-    public static function updateTrending()
-    {
-        $trending = self::trending();
-        foreach ($trending as $stock) {
-            Post::updateList($stock->posts);
-        }
     }
 
     /**

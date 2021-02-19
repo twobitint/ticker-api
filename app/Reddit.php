@@ -13,7 +13,7 @@ class Reddit
             preg_match('/comments\/(.{6})/', $url, $matches);
             return 't3_'.$matches[1];
         });
-        $results = Http::get('https://reddit.com/by_id/' . $names->implode(',') . '.json')
+        $results = Http::get('https://reddit.com/by_id/' . $names->implode(',') . '.json?limit=100')
             ->json('data.children');
 
         if (!$results) {
@@ -78,6 +78,11 @@ class Reddit
             return null;
         }
 
+        // Don't update a post within 15 minutes.
+        if ($post->id && now()->diffInMinutes($post->updated_at) < 15) {
+            return $post;
+        }
+
         // Update post data.
         $post->title = $data['title'];
         $post->content = html_entity_decode($data['selftext_html']);
@@ -90,14 +95,37 @@ class Reddit
         $post->score = $data['score'];
         $post->score_confidence = $data['upvote_ratio'];
 
+        if (!$post->id) {
+            $post->velocity = 0;
+            $post->popularity = 0;
+        } else {
+            if ($elapsed = $post->updated_at->diffInSeconds(now())) {
+                $post->velocity = ($post->score - $post->getOriginal('score')) / $elapsed * 60 * 60;
+            } else {
+                $post->velocity = 0;
+            }
+            // $min = -100;
+            // $max = 100;
+            // $post->popularity = max($min, min($max, $post->velocity));
+            $post->popularity = $post->velocity;
+        }
+
+        $post->updated_at = now();
+
         // We're going to set our own score based on sub size to try to
         // normalize things a bit.
-        $quarterDaysOld = $post->posted_at->diffInMinutes(now()) / (60 * 8);
-        $weightedScore = $post->score * 10 / log($data['subreddit_subscribers']);
-        $post->popularity = $weightedScore / pow(max(0, $quarterDaysOld - 2) + 1, 1.8);
+        // $minimumWeightedScore = 0;
+        // $minutesOld = $post->posted_at->diffInMinutes(now());
+        // $weightedScore = max(
+        //     $minimumWeightedScore,
+        //     $post->score * 10 / log($data['subreddit_subscribers'])
+        // );
+        // $post->popularity = max(0, -0.5 * pow($minutesOld / 60, 3) + $weightedScore);
+
+        // Clamp popularity to a range of velocities.
+
 
         //$post->score = (int)(sqrt($data['score'] * 4 / log($data['subreddit_subscribers'])));
-
 
         $post->save();
 
