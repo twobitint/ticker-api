@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostsTable extends Migration
+class CreateMentionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,22 +13,24 @@ class CreatePostsTable extends Migration
      */
     public function up()
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('mentions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
 
-            $table->string('title', 512);
+            $table->string('url')->unique();
+            $table->string('type');
+            $table->string('title', 512)->nullable();
             $table->text('content')->nullable();
-
-            $table->string('url');
             $table->string('source');
-            $table->string('author');
+            $table->string('author')->nullable();
             $table->string('category')->nullable();
-            $table->string('subcategory')->nullable();
+
+            $table->string('subreddit')->nullable();
+
+            $table->integer('comment_count')->nullable();
             $table->datetime('posted_at');
 
             $table->integer('score')->nullable();
-            $table->decimal('score_confidence', 3, 2)->nullable();
         });
     }
 
@@ -39,6 +41,6 @@ class CreatePostsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('mentions');
     }
 }

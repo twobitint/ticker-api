@@ -52,7 +52,6 @@
 
     <section class="col-span-4">
       <aside class="bg-white rounded-md shadow px-6 py-1">
-        {{-- <x-trending-stocks/> --}}
         <x-tradingview.symbol-profile :stock="$stock"/>
         <x-tradingview.fundamental-data :stock="$stock"/>
       </aside>

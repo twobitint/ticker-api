@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Reddit;
+use App\Yahoo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Post extends Model
+class Mention extends Model
 {
     use HasFactory;
 
@@ -22,25 +22,19 @@ class Post extends Model
     public function stocks()
     {
         return $this->belongsToMany(Stock::class);
-            // ->withSum(['posts' => function ($query) {
-            //     $query->where('posted_at', '>', now()->subDays(7));
-            // }], 'popularity')
-            // ->orderBy('posts_sum_popularity', 'desc');
     }
 
     public function getHotAttribute()
     {
-        return $this->popularity > 20;
+        return $this->score > 20;
     }
 
     public function getContentHtmlAttribute()
     {
         $html = $this->content;
 
-
         // Remove links.
         $html = preg_replace('#<a.*?>.*?</a>#i', '', $html);
-
 
         // Remove other stuff.
         return strip_tags($html, ['p', 'br', 'ul', 'li', 'h1', 'a']);
@@ -48,8 +42,8 @@ class Post extends Model
 
     public function getHeroIconNameAttribute()
     {
-        foreach (config('categories') as $cat => $subcategories) {
-            if (in_array($this->subcategory, $subcategories)) {
+        foreach (config('categories') as $cat => $categories) {
+            if (in_array($this->category, $categories)) {
                 switch ($cat) {
                     case 'analysis':
                         return 'clipboard-list';
@@ -140,7 +134,7 @@ class Post extends Model
     {
         $ids = [];
         foreach ($this->potentialSymbols as $symbol) {
-            if ($stock = Stock::fromYahoo($symbol)) {
+            if ($stock = Yahoo::stockFromSymbol($symbol)) {
                 $ids[] = $stock->id;
             }
         }

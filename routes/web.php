@@ -38,14 +38,6 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('stock');
 
-    Route::get('/cat/{cat}', function ($cat) {
-        return view('home', [
-            'posts' => App\Models\Post::whereIn('subcategory', config('categories.'.$cat))
-                ->orderBy('posted_at', 'desc')
-                ->paginate(),
-        ]);
-    })->name('cat');
-
     Route::get('logout', [AuthController::class, 'logout'])
         ->name('logout');
 

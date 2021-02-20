@@ -2,26 +2,21 @@
 
 namespace App\View\Components;
 
-use App\Models\Mention as PostModel;
+use App\Models\Stock;
 use Illuminate\View\Component;
 
-class Post extends Component
+class TrendingStocks extends Component
 {
-    /**
-     * The underlying post data model.
-     *
-     * @var PostModel
-     */
-    public $model;
+    public $stocks;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(PostModel $model)
+    public function __construct()
     {
-        $this->model = $model;
+        $this->stocks = Stock::trending();
     }
 
     /**
@@ -31,6 +26,6 @@ class Post extends Component
      */
     public function render()
     {
-        return view('components.post');
+        return view('components.trending-stocks');
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateStockSnapshotsTable extends Migration
+class CreateMentionStockTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,14 @@ class CreateStockSnapshotsTable extends Migration
      */
     public function up()
     {
-        Schema::create('stock_snapshots', function (Blueprint $table) {
+        Schema::create('mention_stock', function (Blueprint $table) {
             $table->id();
+            $table->timestamps();
 
-            $table->timestamp('time');
-
+            $table->unsignedBigInteger('mention_id');
             $table->unsignedBigInteger('stock_id');
-            $table->integer('popularity');
 
-            $table->index(['stock_id']);
-            $table->index(['popularity']);
+            $table->unique(['mention_id', 'stock_id']);
         });
     }
 
@@ -33,6 +31,6 @@ class CreateStockSnapshotsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('stock_snapshots');
+        Schema::dropIfExists('mention_stock');
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\Stock;
+use App\Yahoo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -15,7 +15,7 @@ class PositionsImport implements ToCollection, WithHeadingRow
         $ids = [];
         foreach ($rows as $row) {
             if ($symbol = $row['symbol'] ?? false) {
-                if ($stock = Stock::fromYahoo($symbol)) {
+                if ($stock = Yahoo::stockFromSymbol($symbol)) {
                     $ids[] = $stock->id;
                 }
             }

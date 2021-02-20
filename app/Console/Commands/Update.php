@@ -3,9 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Reddit;
-use App\Models\Post;
-use App\Models\Stock;
-use App\Models\StockSnapshot;
+use App\Models\Mention;
 use Illuminate\Console\Command;
 
 class Update extends Command
@@ -42,10 +40,8 @@ class Update extends Command
     public function handle()
     {
         Reddit::updateRising('pennystocks+stocks');
-        $this->handleTrending();
         $this->handleRecent();
-
-        $this->handleStocks();
+        Reddit::updateComments('pennystocks+stocks');
     }
 
     /**
@@ -60,41 +56,13 @@ class Update extends Command
         //   - Don't update a post that's been updated in the last 15 minutes
         //   - Only update up to 10 posts per call
         //   - Prefer higher scoring posts
-        $posts = Post::where('posted_at', '>', now()->subDays(7))
+        $posts = Mention::where('posted_at', '>', now()->subDays(7))
             ->where('updated_at', '<', now()->subMinutes(15))
+            ->where('type', 'post')
             ->latest()
             ->limit(100)
             ->get();
 
         return Reddit::updatePosts($posts);
-    }
-
-    protected function handleTrending()
-    {
-        $trending = Stock::trending();
-        foreach ($trending as $stock) {
-            Reddit::updatePosts($stock->posts);
-        }
-    }
-
-    protected function handleStocks()
-    {
-        Stock::with('posts')->chunk(100, function ($stocks) {
-            $snaps = [];
-            $now = now();
-            foreach ($stocks as $stock) {
-                $popularity = $stock->posts->sum('popularity');
-                if ($popularity != $stock->popularity) {
-                    $stock->popularity = $popularity;
-                    $stock->save();
-                    $snap = new StockSnapshot();
-                    $snap->popularity = $popularity;
-                    $snap->stock_id = $stock->id;
-                    $snap->time = $now;
-                    $snaps[] = $snap->toArray();
-                }
-            }
-            StockSnapshot::insert($snaps);
-        });
     }
 }

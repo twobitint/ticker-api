@@ -9,7 +9,7 @@
         class="w-9 h-9 text-gray-500"/>
     </div>
     <div>
-      <p class="font-semibold text-sm">r/{{ $model->category }}</p>
+      <p class="font-semibold text-sm">r/{{ $model->subreddit }}</p>
       <p class="text-gray-600 text-sm">{{ $model->posted_at->diffForHumans() }}</p>
     </div>
   </header>
