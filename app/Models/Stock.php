@@ -32,9 +32,9 @@ class Stock extends Model
                 $bins[$i] = 1;
             }
             foreach ($this->mentions as $mention) {
-                $bin = $mention->posted_at->diffInHours();
+                $bin = (int)($mention->posted_at->diffInHours() / 6);
                 if ($bin < $totalBins) {
-                    $bins[$bin] += 1; //$mention->score;
+                    $bins[$bin]++; //$mention->score;
                 }
             }
             $this->popularityGraphCache = array_reverse($bins);
@@ -118,14 +118,8 @@ class Stock extends Model
 
     public static function trending($type = 'all')
     {
-        // return Stock::whereHas('mentions', function ($query) {
-        //     $query->where('posted_at', '>', now()->subHours(6));
-        // })->withSum('mentions', 'score')
-        //     ->orderBy('mentions_sum_score', 'desc')
-        //     ->limit(5)
-        //     ->get();
         return Stock::whereHas('mentions', function ($query) {
-            $query->where('posted_at', '>', now()->subHours(6));
+            $query->where('posted_at', '>', now()->subHours(1));
         })->withCount('mentions')
             ->orderBy('mentions_count', 'desc')
             ->limit(10)

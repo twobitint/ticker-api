@@ -16,37 +16,17 @@
       </div>
 
       @php
-        $chartId = md5(rand())
+        $chartId = '_'.md5(rand())
       @endphp
 
-      <div class="ct-chart" id="stock-chart-{{ $chartId }}"></div>
-
-      {{-- <div class="w-20 flex-none text-right">
-        ${{ number_format($stock->regular_market_price, 2) }}
-      </div>
-      <div class="w-24 flex-none flex flex-row-reverse">
-        <div class="rounded-md flex items-center px-2 py-1 {{
-            $stock->up
-              ? 'bg-green-200 text-green-700'
-              : 'bg-red-200 text-red-700'
-          }}">
-          <x-dynamic-component
-            :component="'heroicon-s-arrow-' . ($stock->up ? 'up' : 'down')"
-            class="w-4 h-4 {{
-              $stock->up
-                ? 'text-green-700'
-                : 'text-red-700'
-            }}"/>
-          {{ number_format(abs($stock->regular_market_change_percent), 2) }}%
-        </div>
-      </div>
-      <x-heroicon-o-plus-circle class="flex-none w-6 h-6 text-gray-500 ml-2"/> --}}
-
-      {{-- <div class="w-full h-20">
-        <div class="ct-chart" id="stock-chart-{{ $stock->symbol }}"></div>
-      </div> --}}
+      <div class="ct-chart" id="{{ $chartId }}"></div>
+      <style>
+        #{{ $chartId }} .ct-series-a .ct-bar {
+          stroke: #{{ $stock->color }};
+        }
+      </style>
       <script>
-        new Chartist.Bar('#stock-chart-{{ $chartId }}', {
+        new Chartist.Bar('#{{ $chartId }}', {
           series: [
             @json($stock->popularityGraph)
           ]
@@ -56,18 +36,13 @@
             showLabel: false,
             showGrid: false,
             scaleMinSpace: 0,
-            //type: Chartist.AutoScaleAxis,
           },
           axisY: {
             offset: 0,
             showLabel: false,
             showGrid: false,
           },
-          //referenceValue: null,
           seriesBarDistance: 0,
-          //distributeSeries: true,
-          //fullWidth: true,
-          //showArea: true,
           width: 76,
           height: 40,
           chartPadding: {
