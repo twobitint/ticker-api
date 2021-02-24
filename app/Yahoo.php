@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Models\Stock;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -32,10 +33,18 @@ class Yahoo
                 return $stock;
             }
 
-            // Do not update if the last update was outside of market hours.
-            $ny = $stock->updated_at->setTimezone('America/New_York');
-            if ($ny->hour >= 16 || ($ny->hour < 6 && $ny->minute < 30) || $ny->dayOfWeek >= 6) {
-                return $stock;
+            // Do not update if the last update was outside of market hours
+            // Unless it has not been updated for over a day.
+            if ($stock->updated_at->diffInDays(now()) < 1) {
+                $nys = $stock->updated_at->clone()->setTimezone('America/New_York');
+                $nyn = now()->setTimezone('America/New_York');
+                $nyOpen = Carbon::create($nyn->year, $nyn->month, $nyn->day, 9, 30, 0);
+                $nyClose = Carbon::create($nyn->year, $nyn->month, $nyn->day, 16, 0, 0);
+                $updatedOutside = !$nys->between($nyOpen, $nyClose) || $nys->dayOfWeek >= 6;
+                $marketOpen = $nyn->between($nyOpen, $nyClose) && $nys->dayOfWeek < 6;
+                if ($updatedOutside && !$marketOpen) {
+                    return $stock;
+                }
             }
         }
 

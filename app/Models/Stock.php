@@ -27,12 +27,12 @@ class Stock extends Model
     {
         if (!$this->popularityGraphCache || $force) {
             $bins = [];
-            $totalBins = 6;
+            $totalBins = 7;
             for ($i = 0; $i < $totalBins; $i++) {
                 $bins[$i] = 1;
             }
             foreach ($this->mentions as $mention) {
-                $bin = (int)($mention->posted_at->diffInHours() / 6);
+                $bin = (int)($mention->posted_at->diffInDays());
                 if ($bin < $totalBins) {
                     $bins[$bin]++; //$mention->score;
                 }

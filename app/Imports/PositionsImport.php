@@ -24,5 +24,6 @@ class PositionsImport implements ToCollection, WithHeadingRow
         /** @var $user App\User */
         $user = Auth::user();
         $user->stocksInPositions()->sync($ids);
+        $user->stocksInWatchlist()->syncWithoutDetaching($ids);
     }
 }
